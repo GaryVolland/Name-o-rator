@@ -1,0 +1,92 @@
+{
+    "Region": {
+        "FieldType": "Picklist",
+        "Options": {
+            "United States": "US",
+            "Asia Pacific": "AP",
+            "Europe | Middle East | Africa": "EMEA",
+            "Japan": "JP",
+            "Latin America": "LATAM"
+        }
+    },
+
+    "Business Unit": {
+        "FieldType": "Picklist",
+        "Options": {
+            "IDC": "IDC",
+            "Energy": "Energy", 
+            "Financial": "Financial", 
+            "GOVT": "GOVT",
+            "IEP": "IEP",
+            "MFG": "MFG", 
+            "TEST2019": "TESTKEY2019",
+            "CEC": "CEC", 
+            "Retail": "Retail"
+        }
+    },
+
+    "Program Launch Date": {
+        "FieldType": "Date"  
+    },
+    
+    "Program Type": {
+        "FieldType": "Picklist",
+        "Options": {
+            "Email Send": "ES",
+            "Gated Content": "GC",
+            "In Person Event": "IPE",
+            "Newsletter": "NL",
+            "Nurture": "NR",
+            "Social Advertising": "SA",
+            "Ungated Content": "UC",
+            "Web Conference": "WC",
+            "Web Request": "WR",
+            "Blog": "BG",
+            "Operational": "OP"
+        }
+    },
+    
+    "Picklist Test" : {
+      "FieldType": "Picklist",
+      "Options": {
+          "Option 1":"Option1",
+          "Option 2": "Option2",
+          "Option 3": "Option3"
+      }
+    },
+    
+    
+    "Text Test" : {
+      "FieldType": "Text"  
+    },
+    
+    "Program Type Detail": {
+        "FieldType": "Picklist",
+        "Options": {
+            "Marketo": "MKTO",
+            "IDC-Website": "WEB",
+            "Industry Tradeshow": "TS",
+            "IDC Briefing":"BR", 
+            "IDC Conference": "CON", 
+            "Business Development Social":"SOC",
+            "LinkedIn": "LI",
+            "Facebook": "FB",
+            "Twitter": "TW",
+            "Tech Buyers": "TB",
+            "Tech Suppliers":"TS", 
+            "General":"GEN",
+            "Salesforce": "SFDC"
+        }
+    },
+    
+    
+    "Short Campaign Name": {
+        "FieldType": "Text"
+    },
+    
+    "Configuration": {
+        "FieldType":"Config",
+        "OutputDelimiter": "-",
+        "OutputFormat":["Picklist Test","Text Test","Region","Business Unit","Program Launch Date","Program Type","Program Type Detail","Short Campaign Name"]
+    }
+}

@@ -1,0 +1,202 @@
+<style>
+form {
+  width: 500px
+}
+label {
+ display: inline-block;
+ width: 100px;
+ text-align: right;
+ margin-right: 10px;
+ font-size: 14px
+}
+.formRow {
+  display: block; margin-bottom: 15px
+}
+input, select {
+  width: 200px;
+  font-size: 14px
+}
+#ProgramName {
+  width: 325px;
+  margin: auto;
+  background-color: #D3D3D3;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  border: solid 1px #111
+}
+.error
+{
+    color:red;
+    font-family:verdana, Helvetica;
+    width: auto;
+}
+.output{
+  margin: 25px auto;
+}
+button {
+  background-color: #ce0000;
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+}
+button:hover {border: solid 1px #006fcf}    
+</style>
+<form  id="nameGeneratorForm">
+    <div id = "output" class="formRow output">
+    <input type="Text" name="ProgramName" id="ProgramName">
+    </div>
+    <div class="formRow">
+    <button id="copyText">Copy Program Name</button>
+    </div>
+</form>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"
+  integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+  crossorigin="anonymous"></script>
+
+<script> 
+    // if 0 is in group, then display always in dropdown.
+    // if non-0 is in group, only display it depending on the group selected.
+    // iterate through all objects and generate them on the form.
+    // Generate all fields, by checking if group contains 0 first.
+    // Once we are in ProgramType -- depending on selection - Append the numbers in the global
+    // variable, so var GlobalGroup = [0,2] -- after this seleciton, generate the data in the rest of //the of the drop downs.
+    // use the code you developed for Staples as a gemplate.
+    
+var config = {
+    jsonFilePath: "http://na-sj29.marketo.com/rs/735-XMR-288/images/Model_NameGeneratorJSON.json"
+};
+    
+    
+(function(){
+function generateForm(jsonData){
+    var currentGroup = 0;
+    //generate generate the picklists and inputs for each object
+     $.each(jsonData, function(elementName, elementProperties) {
+             var elementID = elementName.replace(/\s/g, '');
+             if (elementProperties.FieldType === "Picklist") {
+                // assign element name as the id
+                $('#output').before(`
+                                   <div class="formRow">
+                                        <label for="`+ elementName +`">`+ elementName +`</label>
+                                        <select Name="`+ elementName +`" id="`+ elementID +`">
+                                        </select>
+                                    </div>
+                                   `);
+             }
+            else if (elementProperties.FieldType !== 'Config') {
+                 $('#output').before(`
+                                       <div class="formRow">
+                                            <label for="`+ elementName +`">`+ elementName +`</label>
+                                            <input Name="`+ elementName +`"  id="`+ elementID +`" type="`+ elementProperties.FieldType +`"/>
+                                        </div>
+                                       `)
+            }
+
+    })
+    // generate the data inside of each picklist
+     $.each(jsonData, function(elementName, elementProperties) {
+        // if element.FieldType === "Picklist"
+          var elementID = elementName.replace(/\s/g, '');
+          if (elementProperties.FieldType === "Picklist") {
+              $.each(elementProperties.Options, function(optionKey,optionValue){
+                $('#' + elementID).append('<option value="'+ optionValue +'">'+ optionKey +'</option>')  
+              })
+          }
+    })  
+}
+    
+function outputFormatting(jsonData,currentOutputString){
+    // any final massaging of the output name, modify the currentOutputString
+    return currentOutputString;
+}
+    // any changes in the fn that are a 1-off case apply here
+function postFormCreationChanges(){
+    //add code here to make a field readonly
+    //$("#<FieldID>").val("<FieldValue>")
+    //$("#<FieldID>").attr('readonly',true);
+    // add any other changes that would occur after a form has been uploaded.
+}
+    
+function dataFormatting(elementID) {
+    // if the format is text or date modify the code here to manipulate the output
+    if ($("#" + elementID).attr('type') === "Date") {
+        //format the date here
+        return $("#" + elementID).val().split('-').join('');
+    } else {
+        return $("#" + elementID).val();
+    }
+}
+    
+    
+function buildProgramName(jsonData) {
+    var outputFormat = jsonData["Configuration"]["OutputFormat"];
+    var outputFormatDelimiter = jsonData["Configuration"]["OutputDelimiter"];
+    var outputFinalResult = [];
+    jsonData.Configuration["OutputFormat"].forEach(function(element,index){
+        var elementID = element.replace(/\s/g, '');
+        var elementValue = $("#" + elementID + " option:selected").val() ? $("#" + elementID + " option:selected").val() : dataFormatting(elementID);
+        outputFinalResult.push(elementValue);
+    })
+    // replace the final dash with a _
+    return outputFormatting(jsonData,outputFinalResult.join(outputFormatDelimiter));
+}
+
+function registerFormEvents(jsonData) {
+    $('#nameGeneratorForm').on("input",function(e){
+            var programName = buildProgramName(jsonData);
+            $("#ProgramName").val(programName); 
+        })
+}
+    
+    
+function initCopyText(){
+	document.getElementById("copyText").addEventListener("click", function(){
+		var copyTextarea = document.getElementById("ProgramName");
+		console.log(copyTextarea);
+		  copyTextarea.focus();
+		  copyTextarea.select();
+
+		  try {
+		    var successful = document.execCommand('copy');
+		    var msg = successful ? 'successful' : 'unsuccessful';
+		    console.log('Copying text command was ' + msg);
+		  } catch (err) {
+		    console.log('Oops, unable to copy');
+		  }
+	});
+}
+
+var request = new XMLHttpRequest();
+request.open('GET', config.jsonFilePath, true);
+request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+        jsonData = JSON.parse(request.responseText);
+        initCopyText();
+        generateForm(jsonData);
+        registerFormEvents(jsonData);
+        postFormCreationChanges();
+    } else {
+        console.log('We reached our target server, but it returned an error');
+    }
+};
+request.onerror = function() {
+    console.log('There was a connection error of some sort');
+};
+request.send();
+    
+})()
+    
+    
+</script>
+
